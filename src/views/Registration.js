@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import  {getAuth, createUserWithEmailAndPassword}  from '@react-native-firebase/auth';
 const Registration = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -9,11 +9,18 @@ const Registration = () => {
   const navigation = useNavigation();
 
   const handleSignUp = () => {
-    if (email === 'yourEmail' && password === 'yourPassword') {
+    /*if (email === 'yourEmail' && password === 'yourPassword') {
       alert('Login Successful');
     } else {
       alert('Login Failed');
-    }
+    }*/
+    const auth = getAuth();
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(userCredentials => {
+        const user = userCredentials.user;
+        console.log(user.email);
+      })
+      .catch(error => alert(error.message))
   };
 
   const handleSignIn = () => {

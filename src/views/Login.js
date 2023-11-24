@@ -8,8 +8,9 @@ const Login = () => {
   const navigation = useNavigation();
 
   const handleSignIn = () => {
-    if (email === 'yourEmail' && password === 'yourPassword') {
+    if (email === '' && password === '') {
       alert('Login Successful');
+      navigation.navigate('Home');
     } else {
       alert('Login Failed');
     }
