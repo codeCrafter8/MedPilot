@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import jsonServer from '../../api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [users, setUsers] = useState([]);
   const navigation = useNavigation();
 
+  const fetchUsers = () => {
+    jsonServer
+      .get('/users')
+      .then((response) => setUsers(response.data));
+  };
+
   const handleSignIn = () => {
+    //to remove
     if (email === '' && password === '') {
-      alert('Login Successful');
+      navigation.navigate('Home');
+    }
+
+    fetchUsers();
+    const user = users.find((user) => user.email === email && user.password === password);
+
+    if (user) {
       navigation.navigate('Home');
     } else {
       alert('Login Failed');
