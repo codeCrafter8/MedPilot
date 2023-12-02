@@ -19,24 +19,18 @@
         "foregroundImage": "src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.MedPilot",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.anonymous.MedPilot"
     },
     "web": {
       "favicon": "src/assets/favicon.png"
     },
-    "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth"
-    ],
     "extra": {
       "eas": {
         "projectId": "d1c590eb-c9e6-4e21-8494-b5ccd6fe729c"
       }
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.MedPilot",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "bundleIdentifier": "com.anonymous.MedPilot"
     }
   }
 }

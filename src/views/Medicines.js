@@ -1,19 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Image, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import jsonServer from '../../api';
 
 const MedicinesScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Przykładowe dane o lekach (możesz dostosować do swoich potrzeb)
-  const medicinesData = [
-    { id: '1', name: 'Paracetamol', description: 'Środek przeciwbólowy' },
-    { id: '2', name: 'Aspirin', description: 'Przeciwzapalny lek przeciwbólowy' },
-    // Dodaj więcej informacji o lekach, jeśli potrzebujesz
-  ];
+  const [medicines, setMedicines] = useState([]);
+  const [filteredMedicines, setFilteredMedicines] = useState([]);
 
-  // Filtruj leki na podstawie wpisanego zapytania
-  const filteredMedicines = medicinesData.filter(medicine =>
-    medicine.name.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+      jsonServer.get('/medicines',
+      {
+        headers: {
+          'Cache-Control': 'no-cache'
+        },
+      })
+      .then(response => {
+        const fetchedMedicines = response.data;
+
+        if (Array.isArray(fetchedMedicines)) {
+          setMedicines(fetchedMedicines);
+          setFilteredMedicines(fetchedMedicines);
+        } else {
+          setMedicines([]);
+          setFilteredMedicines([]);
+        }
+      })
+  }, []);
+
+  useEffect(() => {
+    const filtered = medicines.filter(item => (item.name)?.toLowerCase().includes(searchQuery.toLowerCase()));
+    setFilteredMedicines(filtered);
+  }, [searchQuery, medicines]);
+
+  const handleArrowButtonClick = (item) => {
+    console.log('Clicked on arrow for:', item.name);
+  };
+
+  const renderItem = ({ item }) => (
+    <View style={styles.medicineItem}>
+      <Image source={require('../assets/favicon.png')} style={styles.medicineImage} />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.medicineName}>{item.name}</Text>
+        <Text>{item.dosage}</Text>
+      </View>
+      <TouchableOpacity onPress={() => handleArrowButtonClick(item)}>
+        <Text style={styles.arrowButton}>➡️</Text>
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -21,19 +54,13 @@ const MedicinesScreen = () => {
       <Text style={styles.header}>Leki</Text>
       <TextInput
         style={styles.searchInput}
-        placeholder="Szukaj leków..."
         onChangeText={(text) => setSearchQuery(text)}
         value={searchQuery}
       />
       <FlatList
         data={filteredMedicines}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.medicineItem}>
-            <Text style={styles.medicineName}>{item.name}</Text>
-            <Text>{item.description}</Text>
-          </View>
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
@@ -58,16 +85,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   medicineItem: {
-    backgroundColor: '#f0f0f0',
-    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 8,
-    borderRadius: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingBottom: 8,
   },
   medicineName: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    marginRight: 8,
   },
+  arrowButton: {
+    fontSize: 24,
+    color: 'blue',
+  },
+  medicineImage: {
+    width: 50,
+    height: 50, 
+    marginRight: 8
+  }
 });
 
 export default MedicinesScreen;
