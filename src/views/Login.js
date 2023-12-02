@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import jsonServer from '../../api';
@@ -9,19 +9,23 @@ const Login = () => {
   const [users, setUsers] = useState([]);
   const navigation = useNavigation();
 
-  const fetchUsers = () => {
-    jsonServer
-      .get('/users')
-      .then((response) => setUsers(response.data));
-  };
+  useEffect(() => {
+    jsonServer.get('/users',
+      {
+        headers: {
+          'Cache-Control': 'no-cache'
+        },
+      })
+      .then((response) => 
+      setUsers(response.data));
+  })
 
   const handleSignIn = () => {
     //to remove
-    if (email === '' && password === '') {
+    /*if (email === '' && password === '') {
       navigation.navigate('Home');
-    }
+    }*/
 
-    fetchUsers();
     const user = users.find((user) => user.email === email && user.password === password);
 
     if (user) {

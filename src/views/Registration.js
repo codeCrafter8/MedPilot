@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import jsonServer from '../../api';
 
 const Registration = () => {
   const [username, setUsername] = useState('');
@@ -9,11 +10,19 @@ const Registration = () => {
   const navigation = useNavigation();
 
   const handleSignUp = () => {
-    if (email === 'yourEmail' && password === 'yourPassword') {
-      alert('Login Successful');
-    } else {
-      alert('Login Failed');
-    }
+    jsonServer
+      .post('/users', {
+        username,
+        email,
+        password,
+      })
+      .then((response) => {
+        if (response.status === 201) {
+          navigation.navigate('Home');
+        } else {
+          alert('Registration Failed');
+        }
+      })
   };
 
   const handleSignIn = () => {
