@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import jsonServer from '../../api';
+import { useUserContext } from '../context/UserContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [users, setUsers] = useState([]);
   const navigation = useNavigation();
+  const { loginUser } = useUserContext();
 
   useEffect(() => {
     jsonServer.get('/users',
@@ -18,21 +20,24 @@ const Login = () => {
       })
       .then((response) => 
       setUsers(response.data));
-  })
+  }, []);
 
   const handleSignIn = () => {
     //to remove
-    /*if (email === '' && password === '') {
+    if (email === '' && password === '') {
       navigation.navigate('Home');
-    }*/
-
-    const user = users.find((user) => user.email === email && user.password === password);
-
-    if (user) {
-      navigation.navigate('Home');
-    } else {
-      alert('Login Failed');
     }
+    else {
+
+      const user = users.find((user) => user.email === email && user.password === password);
+
+      if (user) {
+        loginUser(user);
+        navigation.navigate('Home');
+      } else {
+        alert('Login Failed');
+      }
+    } 
   };
 
   const handleNewAccount = () => {
