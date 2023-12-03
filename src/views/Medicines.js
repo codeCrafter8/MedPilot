@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import jsonServer from '../../api';
+import { useNavigation } from '@react-navigation/native';
 
 const MedicinesScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
       jsonServer.get('/medicines',
@@ -33,7 +35,7 @@ const MedicinesScreen = () => {
   }, [searchQuery, medicines]);
 
   const handleArrowButtonClick = (item) => {
-    console.log('Clicked on arrow for:', item.name);
+    navigation.navigate('MedicineDescription', { medicine: item });
   };
 
   const renderItem = ({ item }) => (

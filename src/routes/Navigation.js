@@ -7,6 +7,7 @@ import Registration from '../views/Registration';
 import Medicines from '../views/Medicines';
 import Map from '../views/Map';
 import NewVisit from '../views/NewVisit';
+import MedicineDescription from '../views/MedicineDescription';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,6 +31,7 @@ function Navigation() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Registration" component={Registration} />
         <Stack.Screen name="Home" component={HomeTabs} />
+        <Stack.Screen name="MedicineDescription" component={MedicineDescription} />
       </Stack.Navigator>
     </NavigationContainer>
   );
