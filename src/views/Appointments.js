@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import jsonServer from '../../api';
-import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useUserContext } from '../context/UserContext';
 
 const AppointmentsScreen = () => {
-  const [appointments, setAppointments] = useState(null);
+  const [appointments, setAppointments] = useState([]);
   const navigation = useNavigation();
   const { loggedInUser } = useUserContext();
+  let viewWithoutAppointments = false;
 
-  useEffect(() => {
+  const fetchAppointments = () => {
     if (!loggedInUser) {
       return;
     }
@@ -20,13 +22,19 @@ const AppointmentsScreen = () => {
         'Cache-Control': 'no-cache'
       },
     })
-      .then(response => {
-        setAppointments(response.data);
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }, [loggedInUser]);
+    .then(response => {
+      setAppointments(response.data);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAppointments();
+    }, [loggedInUser])
+  );
 
   const handleAddAppointment = () => {
     navigation.navigate('NewAppointment');
@@ -34,6 +42,7 @@ const AppointmentsScreen = () => {
 
   const handleEditAppointment = (appointmentId) => {
     console.log(`Edit an appointment with ID ${appointmentId}`);
+    navigation.navigate('EditAppointment', { appointmentId });
   };
 
   const handleDeleteAppointment = (appointmentId) => {
@@ -52,7 +61,7 @@ const AppointmentsScreen = () => {
   const renderItem = ({ item }) => (
     <View style={styles.visitItem}>
       <View style={styles.leftContainer}>
-        <Text style={styles.doctorName}>{item.doctorName}</Text>
+        <Text style={styles.doctorName}>{item.doctorName} {item.doctorSurname}</Text>
         <Text style={styles.specialty}>{item.doctorSpecialty}</Text>
       </View>
 
@@ -68,7 +77,7 @@ const AppointmentsScreen = () => {
     </View>
   );
 
-  if (appointments.length === 0) {
+  if (viewWithoutAppointments === true) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Zapisuj wizyty</Text>
@@ -79,18 +88,35 @@ const AppointmentsScreen = () => {
   else {
     return (
       <View style={styles.visitsContainer}>
-        <Text style={styles.header}>Wizyty</Text>
-        <FlatList
-          data={appointments}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-        />
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>Wizyty</Text>
+          <TouchableOpacity onPress={handleAddAppointment} style={styles.addButton}>
+            <Ionicons name="ios-add" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+          <FlatList
+            data={appointments}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+          />
       </View>
     );
   }
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'teal',
+    padding: 10,
+  },
+  addButton: {
+    padding: 5,
+    marginTop: 30,
+    marginRight: 15,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
