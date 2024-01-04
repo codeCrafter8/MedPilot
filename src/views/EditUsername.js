@@ -1,15 +1,35 @@
-import React from 'react';
-import { View, StyleSheet, ImageBackground,Text,TextInput,TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, ImageBackground,Text,TextInput,TouchableOpacity } from 'react-native';
 import { useNavigation} from '@react-navigation/native';
+import jsonServer from '../../api';
+import { useUserContext } from '../context/UserContext';
 
-const EditEmailScreen = () => {
+const EditUsernameScreen = () => {
   const navigation = useNavigation();
+  const [newUsername, setNewUsername] = useState('');
+  const { loggedInUser } = useUserContext();
 
-  const handleAnuluj = () => {
+  const handleCancel = () => {
     navigation.navigate('Profil');
   }
-  const handleZmien = () => {
-    //navigation.navigate('Profil');
+  const handleChange = () => {
+    if (!newUsername) {
+      Alert.alert('Błąd', 'Pole z nową nazwą użytkownika nie może być puste');
+      return;
+    }
+
+    jsonServer.put(`/users/${loggedInUser.id}`, {
+      username: newUsername,
+      email: loggedInUser.email, 
+      password: loggedInUser.password,
+    })
+      .then(() => {
+        loggedInUser.username = newUsername;
+        navigation.navigate('Profil');
+      })
+      .catch(error => {
+        console.error('Błąd podczas zmiany nazwy użytkownika', error);
+      });
   }
 
   return (
@@ -20,12 +40,14 @@ const EditEmailScreen = () => {
         <TextInput
           style={styles.input2}
           placeholder="Podaj nową nazwę użytkownika"
+          value={newUsername}
+          onChangeText={text => setNewUsername(text)}
         />
         <View style={styles.container3}>
-          <TouchableOpacity onPress={handleAnuluj}>
+          <TouchableOpacity onPress={handleCancel}>
               <Text style={styles.text2}>Anuluj</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleZmien}>
+          <TouchableOpacity onPress={handleChange}>
               <Text style={styles.text3}>Zmień</Text>
           </TouchableOpacity>
         </View>
@@ -84,4 +106,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default EditEmailScreen;
+export default EditUsernameScreen;

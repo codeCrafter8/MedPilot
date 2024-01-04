@@ -1,16 +1,47 @@
-import React from 'react';
-import { View, StyleSheet, ImageBackground,Text,TextInput,TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, ImageBackground,Text,TextInput,TouchableOpacity } from 'react-native';
 import { useNavigation} from '@react-navigation/native';
 import jsonServer from '../../api';
+import { useUserContext } from '../context/UserContext';
 
 const EditEmailScreen = () => {
   const navigation = useNavigation();
+  const [oldEmail, setOldEmail] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
+  const { loggedInUser } = useUserContext();
 
   const handleCancel = () => {
     navigation.navigate('Profil');
   }
   const handleChange = () => {
-    //navigation.navigate('Profil');
+    if (!oldEmail || !newEmail || !confirmEmail) {
+      Alert.alert('Błąd', 'Wszystkie pola muszą być wypełnione');
+      return;
+    }
+
+    if (newEmail !== confirmEmail) {
+      Alert.alert('Błąd', 'Nowe adresy e-mail nie pasują do siebie');
+      return;
+    }
+
+    if (oldEmail !== loggedInUser.email) {
+      Alert.alert('Błąd', 'Podany stary adres e-mail nie zgadza się z aktualnym adresem e-mail');
+      return;
+    }
+    
+    jsonServer.put(`/users/${loggedInUser.id}`, {
+      email: newEmail, 
+      password: loggedInUser.password,
+      username: loggedInUser.username
+    })
+      .then(() => {
+        loggedInUser.email = newEmail;
+        navigation.navigate('Profil');
+      })
+      .catch(error => {
+        console.error('Błąd podczas zmiany adresu e-mail', error);
+      });
   }
 
   return (
@@ -21,14 +52,20 @@ const EditEmailScreen = () => {
         <TextInput
           style={styles.input2}
           placeholder="Podaj stary adres e-mail"
+          value={oldEmail}
+          onChangeText={text => setOldEmail(text)}
         />
         <TextInput
           style={styles.input2}
           placeholder="Podaj nowy adres e-mail"
+          value={newEmail}
+          onChangeText={text => setNewEmail(text)}
         />
         <TextInput
           style={styles.input2}
           placeholder="Potwierdź nowy adres e-mail"
+          value={confirmEmail}
+          onChangeText={text => setConfirmEmail(text)}
         />
         <View style={styles.container3}>
           <TouchableOpacity onPress={handleCancel}>

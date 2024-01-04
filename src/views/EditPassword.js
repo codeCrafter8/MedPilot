@@ -1,15 +1,47 @@
-import React from 'react';
-import { View, StyleSheet, ImageBackground,Text,TextInput,TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, ImageBackground,Text,TextInput,TouchableOpacity } from 'react-native';
 import { useNavigation} from '@react-navigation/native';
+import jsonServer from '../../api';
+import { useUserContext } from '../context/UserContext';
 
-const EditEmailScreen = () => {
+const EditPasswordScreen = () => {
   const navigation = useNavigation();
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const { loggedInUser } = useUserContext();
 
-  const handleAnuluj = () => {
+  const handleCancel = () => {
     navigation.navigate('Profil');
   }
-  const handleZmien = () => {
-    //navigation.navigate('Profil');
+  const handleChange = () => {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      Alert.alert('Błąd', 'Wszystkie pola muszą być wypełnione');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Błąd', 'Nowe hasła nie pasują do siebie');
+      return;
+    }
+
+    if (oldPassword !== loggedInUser.password) {
+      Alert.alert('Błąd', 'Podane stare hasło nie zgadza się z aktualnym hasłem');
+      return;
+    }
+
+    jsonServer.put(`/users/${loggedInUser.id}`, {
+      password: newPassword,
+      email: loggedInUser.email,
+      username: loggedInUser.username
+    })
+      .then(() => {
+        loggedInUser.password = newPassword;
+        navigation.navigate('Profil');
+      })
+      .catch(error => {
+        console.error('Błąd podczas zmiany hasła', error);
+      });
   }
 
   return (
@@ -20,20 +52,29 @@ const EditEmailScreen = () => {
         <TextInput
           style={styles.input2}
           placeholder="Podaj stare hasło"
+          secureTextEntry={true}
+          value={oldPassword}
+          onChangeText={text => setOldPassword(text)}
         />
         <TextInput
           style={styles.input2}
           placeholder="Podaj nowe hasło"
+          secureTextEntry={true}
+          value={newPassword}
+          onChangeText={text => setNewPassword(text)}
         />
         <TextInput
           style={styles.input2}
           placeholder="Potwierdź nowe hasło"
+          secureTextEntry={true}
+          value={confirmPassword}
+          onChangeText={text => setConfirmPassword(text)}
         />
         <View style={styles.container3}>
-          <TouchableOpacity onPress={handleAnuluj}>
+          <TouchableOpacity onPress={handleCancel}>
               <Text style={styles.text2}>Anuluj</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleZmien}>
+          <TouchableOpacity onPress={handleChange}>
               <Text style={styles.text3}>Zmień</Text>
           </TouchableOpacity>
         </View>
@@ -92,4 +133,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default EditEmailScreen;
+export default EditPasswordScreen;
