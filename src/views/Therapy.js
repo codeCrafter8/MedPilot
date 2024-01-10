@@ -19,7 +19,11 @@ const TherapyScreen = () => {
     const startOfWeek = today.getDate() - today.getDay() + 1; 
     const datesOfWeek = Array.from({length: 7}, (_, i) => new Date(today.getFullYear(), today.getMonth(), startOfWeek + i).getDate().toString());
     setDates(datesOfWeek);
-    setSelectedDay(today.getDate().toString());
+
+    const currentDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1;
+    const currentDay = days[currentDayIndex];
+   
+    setSelectedDay(days.includes(currentDay) ? currentDay : '');
   }, []);
 
   const fetchTherapy = () => {
