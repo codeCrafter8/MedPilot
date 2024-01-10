@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import jsonServer from '../../api';
 import { useNavigation } from '@react-navigation/native';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const MedicinesScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
   const navigation = useNavigation();
+
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
+  const [hasPermission, setHasPermission] = useState(null);
+
 
   useEffect(() => {
       jsonServer.get('/medicines',
@@ -34,8 +39,19 @@ const MedicinesScreen = () => {
     setFilteredMedicines(filtered);
   }, [searchQuery, medicines]);
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
   const handleArrowButtonClick = (item) => {
     navigation.navigate('MedicineDescription', { medicine: item });
+  };
+
+  const handleBarcodeButtonClick = () => {
+    setIsBarcodeScannerOpen(true);
   };
 
   const renderItem = ({ item }) => {
@@ -55,7 +71,16 @@ const MedicinesScreen = () => {
       </View>
     );
   };
-  
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setIsBarcodeScannerOpen(false);
+    const scannedMedicine = medicines.find((item) => item.EAN === data);
+    if (scannedMedicine) {
+      navigation.navigate('MedicineDescription', { medicine: scannedMedicine });
+    } else {
+      alert('Nie odnaleziono leku');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -73,11 +98,19 @@ const MedicinesScreen = () => {
             onChangeText={(text) => setSearchQuery(text)}
             value={searchQuery}
           />
-          <Image
-            source={require('../assets/barcode.png')}
-            style={styles.searchImage}
-          />
+          <TouchableOpacity onPress={handleBarcodeButtonClick}>
+            <Image
+              source={require('../assets/barcode.png')}
+              style={styles.searchImage}
+            />
+          </TouchableOpacity>
         </View>
+        {isBarcodeScannerOpen && hasPermission && (
+      <BarCodeScanner
+      style={{ height: 300 }}
+        onBarCodeScanned={handleBarCodeScanned}
+      />
+    )}
         <FlatList
           data={filteredMedicines}
           keyExtractor={(item) => item.id}

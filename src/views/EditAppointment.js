@@ -47,6 +47,7 @@ const EditAppointmentScreen = ({ route }) => {
     jsonServer.put(`/appointments/${appointmentId}`, updatedAppointment)
       .then(response => {
         console.log('Wizyta zaktualizowana:', response.data);
+        navigation.navigate("Wizyty");
       })
       .catch(error => {
         console.error('Błąd podczas aktualizacji wizyty:', error);
@@ -71,7 +72,7 @@ const EditAppointmentScreen = ({ route }) => {
         <TouchableOpacity onPress={handleBack}>
            <Image source={require('../assets/arrowleft.png')}/>
         </TouchableOpacity>
-        <Text style={styles.header}>Nowa wizyta</Text>
+        <Text style={styles.header}>Edytuj wizytę</Text>
       </View>
       <View style={styles.container3}>
         <View style={styles.container4}>

@@ -18,7 +18,7 @@ const Registration = () => {
       })
       .then((response) => {
         if (response.status === 201) {
-          navigation.navigate('Home');
+          navigation.navigate('Login');
         } else {
           alert('Registration Failed');
         }

@@ -56,7 +56,7 @@ const AddMedicineScreen = ({ route }) => {
         <TouchableOpacity onPress={handleBack}>
            <Image source={require('../assets/arrowleft.png')}/>
         </TouchableOpacity>
-        <Text style={styles.header}>Edytuj terapie</Text>
+        <Text style={styles.header}>Edytuj terapię</Text>
       </View>
       <View style={styles.container3}>
         <Text style={styles.text1}>Dla jakiego leku chcesz ustawić przypomnienie?</Text>
