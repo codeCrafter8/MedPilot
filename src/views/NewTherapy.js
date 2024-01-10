@@ -65,10 +65,6 @@ const AddMedicineScreen = () => {
             value={medicineName}
             onChangeText={setMedicineName}
           />
-          <Image
-            source={require('../assets/barcode.png')}
-            style={styles.searchImage}
-          />
         </View>
         <Text style={styles.text2}>W jakie dni przyjmujesz leki?</Text>
         <View style={styles.daysContainer}>

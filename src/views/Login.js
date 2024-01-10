@@ -23,21 +23,18 @@ const Login = () => {
   }, []);
 
   const handleSignIn = () => {
-    //to remove
-    if (email === '' && password === '') {
+    const user = users.find((user) => user.email === email && user.password === password);
+
+    if (user) {
+      loginUser(user);
       navigation.navigate('Home');
+      setTimeout(() => {
+        setEmail('');
+        setPassword('');
+      }, 1000)
+    } else {
+      alert('Nieprawidłowy email lub hasło');
     }
-    else {
-
-      const user = users.find((user) => user.email === email && user.password === password);
-
-      if (user) {
-        loginUser(user);
-        navigation.navigate('Home');
-      } else {
-        alert('Nieprawidłowy email lub hasło');
-      }
-    } 
   };
 
   const handleNewAccount = () => {

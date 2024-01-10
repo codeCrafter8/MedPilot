@@ -4,7 +4,7 @@ import { useUserContext } from '../context/UserContext';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet,Image } from 'react-native';
 import { useNavigation} from '@react-navigation/native';
 
-const AddMedicineScreen = ({ route }) => {
+const EditTherapyScreen = ({ route }) => {
 
   const {therapy2} = route.params;
   const [medicineName, setMedicineName] = useState('');
@@ -26,8 +26,15 @@ const AddMedicineScreen = ({ route }) => {
     });
   };
 
-  const handleAddMedicine = () => {
-    const newMedicine = {
+  useEffect(() => {
+    setMedicineName(therapy2.medicineName || '');
+    setSelectedDays(therapy2.selectedDays || []);
+    setTime(therapy2.time || '');
+    setDoses(therapy2.doses || '');
+  }, [therapy2]);
+
+  const handleEditTherapy = () => {
+    const updatedTherapy = {
       medicineName,
       selectedDays,
       time,
@@ -35,7 +42,7 @@ const AddMedicineScreen = ({ route }) => {
       userId: loggedInUser.id
     };
 
-    jsonServer.post('/therapy', newMedicine)
+    jsonServer.put(`/therapy/${therapy2.id}`, updatedTherapy)
     .then(response => {
       console.log('Zaktualizowano terapie:', response.data);
     })
@@ -43,11 +50,16 @@ const AddMedicineScreen = ({ route }) => {
       console.error('Błąd podczas aktualizacji terapii:', error);
     });
 
-    navigation.navigate('Terapia');
+    therapy2.medicineName = medicineName;
+    therapy2.selectedDays = selectedDays;
+    therapy2.time = time;
+    therapy2.doses = doses;
+  
+    navigation.navigate('TherapyDescription', { therapy: therapy2 });
   };
 
   const handleBack = () => {
-    navigation.navigate('Terapia');
+    navigation.navigate('TherapyDescription', { therapy: therapy2 });
   }
 
   return (
@@ -64,12 +76,8 @@ const AddMedicineScreen = ({ route }) => {
           <TextInput
             style={styles.input}
             placeholder="Nazwa"
-            value={therapy2.medicineName}
+            value={medicineName}
             onChangeText={setMedicineName}
-          />
-          <Image
-            source={require('../assets/barcode.png')}
-            style={styles.searchImage}
           />
         </View>
         <Text style={styles.text2}>W jakie dni przyjmujesz leki?</Text>
@@ -77,7 +85,7 @@ const AddMedicineScreen = ({ route }) => {
           {daysOfWeek.map((day) => (
             <View key={day} style={styles.dayBox}>
               <TouchableOpacity style={styles.dayTouchable} onPress={() => handleDayPress(day)}>
-                <View style={[styles.checkBox, { borderColor: therapy2.selectedDays.includes(day) ? '#009BB1' : 'gray', borderWidth: 1, backgroundColor: therapy2.selectedDays.includes(day) ? '#009BB1' : 'white' }]} />
+                <View style={[styles.checkBox, { borderColor: selectedDays.includes(day) ? '#009BB1' : 'gray', borderWidth: 1, backgroundColor: selectedDays.includes(day) ? '#009BB1' : 'white' }]} />
               </TouchableOpacity>
               <Text style={styles.text3}>{day}</Text>
             </View>
@@ -93,7 +101,7 @@ const AddMedicineScreen = ({ route }) => {
               style={{ ...styles.input2, color: '#009BB1'}}
               placeholder="HH:MM"
               placeholderTextColor="#009BB1"
-              value={therapy2.time}
+              value={time}
               onChangeText={setTime}
             />
           </View>
@@ -107,12 +115,12 @@ const AddMedicineScreen = ({ route }) => {
             style={{ ...styles.input2, color: '#009BB1'}}
             placeholder="Podaj liczbę dawek"
             placeholderTextColor="#009BB1"
-            value={therapy2.doses}
+            value={doses}
             onChangeText={setDoses}
           />
         </View>
         <View style={styles.container7}>
-          <TouchableOpacity onPress={handleAddMedicine} style={styles.add2Button}>
+          <TouchableOpacity onPress={handleEditTherapy} style={styles.add2Button}>
             <Text style={styles.buttonText}>Aktualizuj</Text>
           </TouchableOpacity>
         </View>
@@ -226,4 +234,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddMedicineScreen;
+export default EditTherapyScreen;

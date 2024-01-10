@@ -20,6 +20,7 @@ import EditPassword from '../views/EditPassword';
 import EditTherapy from '../views/EditTherapy';
 import TherapyDescription from '../views/TherapyDescription';
 import Contact from '../views/Contact';
+import BarcodeScanner from '../views/BarcodeScanner';
 import { Image } from 'react-native';
 
 const Stack = createNativeStackNavigator();
@@ -145,6 +146,7 @@ function Navigation() {
         <Stack.Screen name="Contact" component={Contact} />
         <Stack.Screen name="TherapyDescription" component={TherapyDescription} />
         <Stack.Screen name="EditTherapy" component={EditTherapy} />
+        <Stack.Screen name="BarcodeScanner" component={BarcodeScanner} />
       </Stack.Navigator>
     </NavigationContainer>
   );

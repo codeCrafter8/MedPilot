@@ -15,11 +15,45 @@ const TherapyDescriptionScreen = ({ route }) => {
     };
 
     const handleDone = () => {
-        navigation.navigate('Terapia');
-    };
+      if (therapy.doses > 0) {
+        const updatedTherapy = { ...therapy, doses: therapy.doses - 1 };
+    
+        jsonServer
+          .put(`/therapy/${therapy.id}`, updatedTherapy)
+          .then(() => {
+            if (updatedTherapy.doses > 0) {
+              navigation.navigate('Terapia');
+            } else {
+              jsonServer
+                .delete(`/therapy/${therapy.id}`)
+                .then(() => {
+                  navigation.navigate('Terapia');
+                })
+                .catch((error) => {
+                  console.error(`Error deleting therapy with ID ${therapy.id}:`, error);
+                });
+            }
+          })
+          .catch((error) => {
+            console.error(`Error updating therapy with ID ${therapy.id}:`, error);
+          });
+      }
+    };      
+
     const handleEdit = () => {
       navigation.navigate('EditTherapy',{ therapy2: therapy});
   };
+
+  const handleDelete = (therapyId) => {
+    jsonServer
+      .delete(`/therapy/${therapyId}`)
+      .then(() => {
+        navigation.navigate('Terapia');
+      })
+      .catch((error) => {
+        console.error(`Error deleting therapy with ID ${therapyId}:`, error);
+      });
+  }
 
     return (
         <View style={styles.container}>
@@ -37,7 +71,7 @@ const TherapyDescriptionScreen = ({ route }) => {
             <TouchableOpacity onPress={handleEdit}style={styles.addButton}>
                 <Text style={styles.buttonText}>Edytuj</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleDone} style={styles.add3Button}>
+            <TouchableOpacity onPress={() => handleDelete(therapy.id)} style={styles.add3Button}>
                 <Text style={styles.buttonText}>Usuń</Text>
             </TouchableOpacity>
           </View>
@@ -76,6 +110,7 @@ const TherapyDescriptionScreen = ({ route }) => {
         fontWeight: 'bold',
         paddingLeft:18,
         color:'white',
+        width: 200,
       },
       header2: {
         fontSize: 32,

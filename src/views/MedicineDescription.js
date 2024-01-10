@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, BackHandler } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  
 
 const MedicineDescriptionScreen = ({ route }) => {
@@ -8,8 +8,17 @@ const MedicineDescriptionScreen = ({ route }) => {
   const { medicine } = route.params;
 
   const handleBack = () => {
-    navigation.navigate('Home');
+    navigation.navigate('Leki');
+    return true;
   }
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBack);
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
     return (
         <View style={styles.container}>
