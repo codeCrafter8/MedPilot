@@ -115,7 +115,7 @@ const EditTherapyScreen = ({ route }) => {
             style={{ ...styles.input2, color: '#009BB1'}}
             placeholder="Podaj liczbę dawek"
             placeholderTextColor="#009BB1"
-            value={doses}
+            value={doses.toString()}
             onChangeText={setDoses}
           />
         </View>
@@ -145,11 +145,11 @@ const styles = StyleSheet.create({
   },
   dayTouchable: {
     width: '100%',
-    aspectRatio: 1, // To keep it a square
+    aspectRatio: 1, 
   },
   checkBox: {
     width: '70%',
-    aspectRatio: 1, // To keep it a square
+    aspectRatio: 1, 
   },
   container2:{
     backgroundColor:'#009BB1',
