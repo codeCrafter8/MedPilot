@@ -12,14 +12,24 @@ const Login = () => {
   const { loginUser } = useUserContext();
 
   useEffect(() => {
-    jsonServer.get('/users',
-      {
-        headers: {
-          'Cache-Control': 'no-cache'
-        },
-      })
-      .then((response) => 
-      setUsers(response.data));
+    const fetchUsers = async () => {
+      try {
+        const response = await jsonServer.get('/users', {
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users data:', error);
+      }
+    };
+
+    fetchUsers();
+
+    const intervalId = setInterval(fetchUsers, 1000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleSignIn = () => {

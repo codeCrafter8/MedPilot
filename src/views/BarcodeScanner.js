@@ -31,7 +31,9 @@ const BarcodeScannerScreen = ({ route }) => {
     if (scannedMedicine) {
       navigation.navigate('MedicineDescription', { medicine: scannedMedicine });
     } else {
-      showAlert();
+      setTimeout(() => {
+        showAlert();
+      }, 2000); 
     }
   };
 
